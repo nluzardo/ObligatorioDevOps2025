@@ -34,3 +34,16 @@ elif [ "$1" = "-C" ]; then
 else
     ARCHIVO="$1"
 fi
+
+#Aca validamos que el archvo exista 
+if [ ! -f "$ARCHIVO" ]; then
+    echo "Error: el archivo '$ARCHIVO' no existe o no es regular."
+    exit 2
+fi
+
+#Validacion de permisos sobre el archivo
+if [ ! -r "$ARCHIVO" ]; then
+    echo "Error: no hay permisos de lectura sobre '$ARCHIVO'."
+    exit 3
+fi
+
