@@ -25,11 +25,11 @@ E_USERADD=6           # fallo al crear un usuario (useradd/chpasswd)
 mostrar_uso() {
     # Muestra ayuda por STDERR y devuelve código de uso
     cat >&2 <<EOF
-Uso: $0 [-i] [-c contraseña] Archivo_con_los_usuarios
+Uso: $0 [-i] [-C contraseña] Archivo_con_los_usuarios
   -i                Informar resultado por cada usuario
-  -c "contraseña"   Asignar esta contraseña a todos los usuarios creados
+  -C "contraseña"   Asignar esta contraseña a todos los usuarios creados
 Ejemplo:
-  $0 -i -c "123456" Usuarios
+  $0 -i -C "123456" Usuarios
 EOF
     exit $E_USAGE  #Error de Uso incorrecto
 }
@@ -95,3 +95,47 @@ do
         echo "listo"
 	continue
     fi
+ # Si el comentario está vacío
+    [ -z "$COMENTARIO" ] && COMENTARIO="Sin comentario"
+
+    # Si el home está vacío
+    [ -z "$HOME" ] && HOME="/home/$USUARIO"
+
+    # Si el shell está vacío
+    [ -z "$SHELL" ] && SHELL="/bin/bash"
+
+ # Determinar si se crea el home
+    if [ "$CREARHOME" = "SI" ]; then
+        OPCION_HOME="-m"
+    else
+        OPCION_HOME=""
+    fi
+    # Crear el usuario
+    useradd $OPCION_HOME -d "$HOME" -s "$SHELL" -c "$COMENTARIO" "$USUARIO" 2>/dev/null
+    RESULTADO=$?
+
+    if [ $RESULTADO -eq 0 ]; then
+        # Si hay contraseña definida
+        if [ -n "$PASSWORD" ]; then
+            echo "$USUARIO:$PASSWORD" | chpasswd 2>/dev/null
+        fi
+        CREADOS=$((CREADOS + 1))
+        if [ $INFO -eq 1 ]; then
+            echo "Usuario $USUARIO creado con éxito con datos:"
+            echo "  Comentario: $COMENTARIO"
+            echo "  Dir home: $HOME"
+            echo "  Crear home: $CREARHOME"
+            echo "  Shell: $SHELL"
+            echo ""
+        fi
+    else
+        echo "ATENCIÓN: el usuario $USUARIO no pudo ser creado." >&2
+        ERROR_FLAG=$E_USERADD
+    fi
+
+done < "$ARCHIVO"
+
+echo ""
+echo "Se han creado $CREADOS usuarios con éxito."
+
+exit $ERROR_FLAG
