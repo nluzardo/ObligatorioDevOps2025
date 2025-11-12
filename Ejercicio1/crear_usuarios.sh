@@ -7,11 +7,17 @@ PASSWORD="" #Password por defecto, vacia
 ARCHIVO="" #archivo por defecto, vacio 
 
 #Funcion para mostrar el uso
+
 mostrar_uso() {
-    echo "Uso: $0 [-i] [-C contraseña] archivo_usuarios.txt"
-    echo "Ejemplo:"
-    echo "  $0 -i -C 1234 usuarios.txt"
-    exit 1
+    # Muestra ayuda por STDERR y devuelve código de uso
+    cat >&2 <<EOF
+Uso: $0 [-i] [-c contraseña] Archivo_con_los_usuarios
+  -i                Informar resultado por cada usuario
+  -c "contraseña"   Asignar esta contraseña a todos los usuarios creados
+Ejemplo:
+  $0 -i -c "123456" Usuarios
+EOF
+    exit $E_USAGE  #Error de Uso incorrecto
 }
 
 #Chequeamos que la cantidad de parametros sea la correcta
