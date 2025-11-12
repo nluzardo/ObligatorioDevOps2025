@@ -11,6 +11,7 @@ ERROR_FLAG=0          # si queda en 0 -> todo ok; distinto -> hubo errores
 
 
 #Errores posibles del programa
+
 E_USAGE=1             # error de uso / parámetros
 E_NOFILE=2            # no se especificó archivo
 E_NOTREG=3            # archivo no es regular o no existe
@@ -31,7 +32,7 @@ Uso: $0 [-i] [-C contraseña] Archivo_con_los_usuarios
 Ejemplo:
   $0 -i -C "123456" Usuarios
 EOF
-    exit $E_USAGE  #Error de Uso incorrecto
+    exit $E_USAGE  #Error de Uso incorrecto del programa
 }
 
 #Chequeamos que la cantidad de parametros sea la correcta
