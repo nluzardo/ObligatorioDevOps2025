@@ -64,6 +64,13 @@ else
     ARCHIVO="$1"
 fi
 
+#Chequeamos si se epecifico o no una contraseña y avisamos al usuario
+if [ -z "$PASSWORD" ]; then
+    echo "No se especificó una contraseña. Los usuarios se crearán sin contraseña."
+else
+    echo "Se utilizará la contraseña especificada: '$PASSWORD'"
+fi
+
 #Aca validamos que el archivo exista
 if [ ! -f "$ARCHIVO" ]; then
     echo "Error: el archivo no existe, no es regular o no se agrego a los parametros."
