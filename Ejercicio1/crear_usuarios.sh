@@ -5,6 +5,20 @@
 INFO=0 #Indica por defecto que no mostremos informacion
 PASSWORD="" #Password por defecto, vacia
 ARCHIVO="" #archivo por defecto, vacio 
+CREADOS=0             # contador de usuarios creados exitosamente
+LINEA_NUM=0           # número de línea actual (para mensajes de error)
+ERROR_FLAG=0          # si queda en 0 -> todo ok; distinto -> hubo errores
+
+
+#Errores posibles del programa
+E_USAGE=1             # error de uso / parámetros
+E_NOFILE=2            # no se especificó archivo
+E_NOTREG=3            # archivo no es regular o no existe
+E_NOREAD=4            # no hay permisos de lectura sobre el archivo
+E_BADFORMAT=5         # línea con formato incorrecto (número de campos distinto de 5)
+E_USERADD=6           # fallo al crear un usuario (useradd/chpasswd)
+
+
 
 #Funcion para mostrar el uso
 
