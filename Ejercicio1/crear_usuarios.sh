@@ -79,4 +79,19 @@ if [ ! -r "$ARCHIVO" ]; then
 fi
 
 echo "Creando usuarios"
-echo "listo"
+while IFS=":" read -r USUARIO COMENTARIO HOME CREARHOME SHELL #Leemos una linea a la vez del archivo y se pasa por bucle
+do
+    LINEA_NUM=$((LINEA_NUM + 1))
+
+    # Ignorar líneas vacías o comentarios
+    [ -z "$USUARIO" ] && continue
+    [[ "$USUARIO" =~ ^# ]] && continue
+
+    # Verificar que tenga exactamente 5 campos
+    CAMPOS=$(echo "$USUARIO:$COMENTARIO:$HOME:$CREARHOME:$SHELL" | awk -F: '{print NF}')
+    if [ "$CAMPOS" -ne 5 ]; then
+        echo "Error en línea $LINEA_NUM: formato incorrecto (se esperaban 5 campos)." >&2
+        ERROR_FLAG=$E_BADFORMAT
+        echo "listo"
+	continue
+    fi
