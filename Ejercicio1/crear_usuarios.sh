@@ -64,7 +64,12 @@ while [ $# -gt 0 ]; do
                 exit $E_USAGE
             fi
             PASSWORD="$2"   # Guardamos contraseña
-            shift 2         # Avanzamos dos posiciones
+            if [[ "$PASSWORD" =~ \  ]]; then
+                echo "Error: la contraseña no puede contener espacios." >&2
+                mostrar_uso
+		exit $E_USAGE
+            fi
+	    shift 2         # Avanzamos dos posiciones
             ;;
         -*)
             # Cualquier otro modificador es inválido (-I, -C, etc)
