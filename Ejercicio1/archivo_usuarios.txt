@@ -1,4 +1,10 @@
 pepe:este es mi amigo pepe:/home/jose:SI:/bin/bash
 maria:debe:/home/maria:NO:/bin/bash
 otrousuario:debemos:/home/otrousuario:SI:/bin/bash
-usuariovalido: : : : :
+pepedos:este es mi amigo pepe:/home/jose:SI:/bin/bash
+usuariovalido: :/home:SI:
+usuariossssvalidosss: :/home:SI:
+validuser:comentario:/home:SI:/bin/bash
+ultimousuario:::NO::
+ahorasielultimo:::NO:
+deberitas:::NO:

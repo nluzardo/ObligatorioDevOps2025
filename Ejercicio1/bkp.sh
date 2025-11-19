@@ -107,6 +107,29 @@ if [ ! -r "$ARCHIVO" ]; then
     exit 5
 fi
 
+# Evaluar si se debe crear el home
+    if [ "$CREARHOME" = "SI" ]; then
+  # Si se va a crear, validar que la ruta sea absoluta
+        if [[ "$HOME" != /* ]]; then
+            echo "Advertencia línea $LINEA_NUM: el home asignado no es ruta absoluta. Se usará '/home/$USUARIO'."
+            HOME="/home/$USUARIO"
+        fi
+        OPCION_HOME="-m"
+  # Si se eligio que no se cree el home
+    elif [ "$CREARHOME" = "NO" ]; then
+        OPCION_HOME="-M"
+        if [ $INFO -eq 1 ]; then
+            echo "Línea $LINEA_NUM: no se creará el home porque el archivo especifica NO."
+        fi
+
+   # Cualquier otro valor se toma como NO
+    else
+        OPCION_HOME="-M"
+        if [ $INFO -eq 1 ]; then
+            echo "Línea $LINEA_NUM: valor inválido para crear home. Se tomará como NO."
+        fi
+    fi
+
 echo "Creando usuarios"
 while IFS=":" read -r USUARIO COMENTARIO HOME CREARHOME SHELL
 do
@@ -140,28 +163,6 @@ do
         continue
     fi
 
-# Evaluar si se debe crear el home
-    if [ "$CREARHOME" = "SI" ]; then
-  # Si se va a crear, validar que la ruta sea absoluta
-        if [[ "$HOME" != /* ]]; then
-            echo "Advertencia línea $LINEA_NUM: el home asignado no es ruta absoluta. Se usará '/home/$USUARIO'."
-            HOME="/home/$USUARIO"
-        fi
-        OPCION_HOME="-m"
-  # Si se eligio que no se cree el home
-    elif [ "$CREARHOME" = "NO" ]; then
-        OPCION_HOME="-M"
-        if [ $INFO -eq 1 ]; then
-            echo "Línea $LINEA_NUM: no se creará el home porque el archivo especifica NO."
-        fi
-   # Cualquier otro valor se toma como NO
-    else
-        OPCION_HOME="-M"
-        if [ $INFO -eq 1 ]; then
-            echo "Línea $LINEA_NUM: valor inválido para crear home. Se tomará como NO."
-        fi
-    fi
-
     # Valores por defecto
     [ -z "$COMENTARIO" ] && COMENTARIO="Sin comentario"
     [ -z "$HOME" ] && HOME="/home/$USUARIO"
@@ -180,18 +181,12 @@ do
         CREADOS=$((CREADOS + 1))
 
         if [ $INFO -eq 1 ]; then
-	    #Este if siguiente es para informar si se creo el home o no
-	    if [ "$CREARHOME" = "SI" ]; then
-               INFO_HOME="$HOME"
-            else
-               INFO_HOME="NO se creó (por especificación del archivo)"
-            fi
             echo ""
             echo "-------------------------------------------"
             echo " Usuario creado: $USUARIO"
             echo "-------------------------------------------"
             echo " Comentario: $COMENTARIO"
-            echo " Home:       $INFO_HOME"
+            echo " Home:       $HOME"
             echo " Crear home: $CREARHOME"
             echo " Shell:      $SHELL"
             echo "-------------------------------------------"
