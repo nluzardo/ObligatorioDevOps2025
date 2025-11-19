@@ -63,13 +63,14 @@ while [ $# -gt 0 ]; do
                 mostrar_uso
                 exit $E_USAGE
             fi
+            # Validar que la contraseña NO tenga espacios
             PASSWORD="$2"   # Guardamos contraseña
-            if [[ "$PASSWORD" =~ \  ]]; then
+	    if [[ "$PASSWORD" =~ \  ]]; then
                 echo "Error: la contraseña no puede contener espacios." >&2
                 mostrar_uso
 		exit $E_USAGE
             fi
-	    shift 2         # Avanzamos dos posiciones
+            shift 2         # Avanzamos dos posiciones
             ;;
         -*)
             # Cualquier otro modificador es inválido (-I, -C, etc)
