@@ -153,7 +153,7 @@ do
             echo "Usuario $USUARIO creado con éxito con datos:"
             echo "  Comentario: $COMENTARIO"
             echo "  Dir home: $HOME"
-          	echo "  Asegurado existencia de directorio home: $CREARHOME" 
+            echo "  Asegurado existencia de directorio home: $CREARHOME" 
             echo "  Shell: $SHELL"
             echo ""
         fi
