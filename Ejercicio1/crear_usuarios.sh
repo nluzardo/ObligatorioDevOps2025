@@ -19,7 +19,7 @@ E_NOREAD=4            # no hay permisos de lectura sobre el archivo
 E_BADFORMAT=5         # línea con formato incorrecto (número de campos distinto de 5)
 E_USERADD=6           # fallo al crear un usuario (useradd/chpasswd)
 E_USERDUP=7           # usuario duplicado
-E_BADUSER=8         # Nombre de usuario no valido
+E_BADUSER=8           # Nombre de usuario no valido
 
 #Funcion para mostrar el uso
 
@@ -108,7 +108,7 @@ if [ ! -r "$ARCHIVO" ]; then
 fi
 
 echo "Creando usuarios"
-while IFS=":" read -r USUARIO COMENTARIO HOME CREARHOME SHELL #Leemos una linea a la vez del archivo y se pasa por bucle
+while IFS=":" read -r USUARIO COMENTARIO HOME CREARHOME SHELL
 do
     LINEA_NUM=$((LINEA_NUM + 1))
 
@@ -121,64 +121,82 @@ do
     if [ "$CAMPOS" -ne 5 ]; then
         echo "Error en línea $LINEA_NUM: formato incorrecto (se esperaban 5 campos)." >&2
         ERROR_FLAG=$E_BADFORMAT
-        echo "listo"
-	continue
+        continue
     fi
- # Si el comentario está vacío
+
+    # Validar nombre de usuario
+    if ! [[ "$USUARIO" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+        echo "Error en línea $LINEA_NUM: nombre de usuario inválido '$USUARIO'." >&2
+        ERROR_FLAG=$E_BADUSER
+        continue
+    fi
+
+    # Validar si ya existe
+    if id "$USUARIO" &>/dev/null; then
+        if [ $INFO -eq 1 ]; then
+            echo "El usuario $USUARIO ya existe. No se creará nuevamente."
+        fi
+        ERROR_FLAG=$E_USERDUP
+        continue
+    fi
+
+    # Valores por defecto
     [ -z "$COMENTARIO" ] && COMENTARIO="Sin comentario"
-
-    # Si el home está vacío
     [ -z "$HOME" ] && HOME="/home/$USUARIO"
-
-    # Si el shell está vacío
     [ -z "$SHELL" ] && SHELL="/bin/bash"
 
- # Determinar si se crea el home
+  # Evaluar si se debe crear el home
     if [ "$CREARHOME" = "SI" ]; then
+    # Si se va a crear, validar que la ruta sea absoluta
+        if [[ "$HOME" != /* ]]; then
+            echo "Advertencia línea $LINEA_NUM: home '$HOME' no es ruta absoluta. Se usará '/home/$USUARIO'."
+            HOME="/home/$USUARIO"
+        fi
         OPCION_HOME="-m"
-    else
-        OPCION_HOME=""
-    fi
- # Crear el usuario
-    if id "$USUARIO" &>/dev/null; then # Corroborar que el usuario ya exista o no
-    if [ $INFO -eq 1 ]; then
-        echo "El usuario $USUARIO ya existe. No se creará nuevamente."
-        ERROR_FLAG=$E_USERDUP
-    fi
-    continue
-    fi
 
-    # Chequear que el usuario no tenga caracteres no comprendidos o espacios
-    if ! [[ "$USUARIO" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
-    echo "Error línea $LINEA_NUM: nombre de usuario inválido '$USUARIO'." >&2
-    ERROR_FLAG=$E_BADUSER
-    fi
+    elif [ "$CREARHOME" = "NO" ]; then
+        OPCION_HOME="-M"
+        if [ $INFO -eq 1 ]; then
+            echo "Línea $LINEA_NUM: no se creará el home porque el archivo especifica NO."
+        fi
 
+# Cualquier otro valor se toma como NO
+else
+    OPCION_HOME="-M"
+    echo "Línea $LINEA_NUM: valor inválido '$CREARHOME' para crear home. Se tomará como NO."
+fi
+
+
+    # Crear usuario
     useradd $OPCION_HOME -d "$HOME" -s "$SHELL" -c "$COMENTARIO" "$USUARIO" 2>/dev/null
     RESULTADO=$?
 
     if [ $RESULTADO -eq 0 ]; then
-        # Si hay contraseña definida
+        # Asignar contraseña si corresponde
         if [ -n "$PASSWORD" ]; then
             echo "$USUARIO:$PASSWORD" | chpasswd 2>/dev/null
         fi
+
         CREADOS=$((CREADOS + 1))
+
         if [ $INFO -eq 1 ]; then
             echo ""
-	    echo "Usuario $USUARIO creado con éxito con datos:"
-            echo "  Comentario: $COMENTARIO"
-            echo "  Dir home: $HOME"
-            echo "  Asegurado existencia de directorio home: $CREARHOME"
-            echo "  Shell: $SHELL"
+            echo "-------------------------------------------"
+            echo " Usuario creado: $USUARIO"
+            echo "-------------------------------------------"
+            echo " Comentario: $COMENTARIO"
+            echo " Home:       $HOME"
+            echo " Crear home: $CREARHOME"
+            echo " Shell:      $SHELL"
+            echo "-------------------------------------------"
             echo ""
         fi
     else
-        echo "ATENCIÓN: el usuario $USUARIO no pudo ser creado." >&2
+        echo "ATENCIÓN: el usuario '$USUARIO' no pudo ser creado." >&2
         ERROR_FLAG=$E_USERADD
     fi
 
 done < "$ARCHIVO"
-
 echo ""
 echo "Se han creado $CREADOS usuarios con éxito."
 

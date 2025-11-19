@@ -1,4 +1,4 @@
 pepe:este es mi amigo pepe:/home/jose:SI:/bin/bash
 maria:debe:/home/maria:NO:/bin/bash
 otrousuario:debemos:/home/otrousuario:SI:/bin/bash
-*: : : : :
+usuariovalido: : : : :
