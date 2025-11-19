@@ -26,11 +26,11 @@ E_USERADD=6           # fallo al crear un usuario (useradd/chpasswd)
 mostrar_uso() {
     # Muestra ayuda por STDERR y devuelve código de uso
     cat >&2 <<EOF
-Uso: $0 [-i] [-C contraseña] Archivo_con_los_usuarios
+Uso: $0 [-i] [-c contraseña] Archivo_con_los_usuarios
   -i                Informar resultado por cada usuario
-  -C "contraseña"   Asignar esta contraseña a todos los usuarios creados
+  -c "contraseña"   Asignar esta contraseña a todos los usuarios creados
 Ejemplo:
-  $0 -i -C "123456" Usuarios
+  $0 -i -c "123456" Usuarios
 EOF
     exit $E_USAGE  #Error de Uso incorrecto del programa
 }
@@ -42,29 +42,50 @@ if [ $# -lt 1 ] || [ $# -gt 4 ]; then
 fi
 
 #Chequeamos que los parametros esten en orden correcto
-if [ "$1" = "-i" ]; then
-    INFO=1
-    if [ "$2" = "-C" ]; then
-        PASSWORD="$3"
-        ARCHIVO="$4"
-    elif [ "$2" = "-c" ];then #Solo admitimos el parametro -C
-        echo "Error, -c no es un parametro aceptado." 
-        mostrar_uso
-        exit 2
-    else
-        ARCHIVO="$2"
-    fi
-elif [ "$1" = "-I" ]; then #Solo admitimos el parametro como -i
-    echo "Error, -I no es un parametro aceptado."
+
+# Si la cantidad de parámetros es inválida
+if [ $# -lt 1 ] || [ $# -gt 4 ]; then
+    echo "Error: cantidad incorrecta de parámetros."
     mostrar_uso
-    exit 3
-elif [ "$1" = "-C" ]; then
-    PASSWORD="$2"
-    ARCHIVO="$3"
-else
-    ARCHIVO="$1"
 fi
 
+# Procesamiento de parámetros permitidos: -i y -c
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -i)
+            INFO=1   # Activar modo información
+            shift    # Pasar al siguiente parámetro
+            ;;
+        -c)
+            # Opción de contraseña, requiere argumento
+            if [ -z "$2" ]; then
+                echo "Error: la opción -c requiere una contraseña." >&2
+                mostrar_uso
+                exit $E_USAGE
+            fi
+            PASSWORD="$2"   # Guardamos contraseña
+            shift 2         # Avanzamos dos posiciones
+            ;;
+        -*)
+            # Cualquier otro modificador es inválido (-I, -C, etc)
+            echo "Error: parámetro inválido '$1'." >&2
+            mostrar_uso
+            exit $E_USAGE
+            ;;
+        *)
+            # Primer parámetro que no es opción → es el archivo
+            ARCHIVO="$1"
+            shift # Mueve todo un parámetro hacia la izquierda
+            ;;
+    esac
+done
+
+# Validación: debe haberse recibido un archivo
+if [ -z "$ARCHIVO" ]; then
+    echo "Error: no se especificó archivo." >&2
+    mostrar_uso
+    exit $E_NOFILE
+fi
 #Chequeamos si se epecifico o no una contraseña y avisamos al usuario
 if [ -z "$PASSWORD" ]; then
     echo "No se especificó una contraseña. Los usuarios se crearán sin contraseña."
@@ -132,7 +153,7 @@ do
             echo "Usuario $USUARIO creado con éxito con datos:"
             echo "  Comentario: $COMENTARIO"
             echo "  Dir home: $HOME"
-            echo "  Crear home: $CREARHOME"
+          	echo "  Asegurado existencia de directorio home: $CREARHOME" 
             echo "  Shell: $SHELL"
             echo ""
         fi
