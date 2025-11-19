@@ -19,7 +19,7 @@ E_NOREAD=4            # no hay permisos de lectura sobre el archivo
 E_BADFORMAT=5         # línea con formato incorrecto (número de campos distinto de 5)
 E_USERADD=6           # fallo al crear un usuario (useradd/chpasswd)
 E_USERDUP=7           # usuario duplicado
-
+E_BADUSER=8         # Nombre de usuario no valido
 
 #Funcion para mostrar el uso
 
@@ -139,14 +139,21 @@ do
     else
         OPCION_HOME=""
     fi
-    # Crear el usuario
-    if id "$USUARIO" &>/dev/null; then
+ # Crear el usuario
+    if id "$USUARIO" &>/dev/null; then # Corroborar que el usuario ya exista o no
     if [ $INFO -eq 1 ]; then
         echo "El usuario $USUARIO ya existe. No se creará nuevamente."
         ERROR_FLAG=$E_USERDUP
     fi
     continue
     fi
+
+    # Chequear que el usuario no tenga caracteres no comprendidos o espacios
+    if ! [[ "$USUARIO" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+    echo "Error línea $LINEA_NUM: nombre de usuario inválido '$USUARIO'." >&2
+    ERROR_FLAG=$E_BADUSER
+    fi
+
     useradd $OPCION_HOME -d "$HOME" -s "$SHELL" -c "$COMENTARIO" "$USUARIO" 2>/dev/null
     RESULTADO=$?
 
@@ -157,10 +164,11 @@ do
         fi
         CREADOS=$((CREADOS + 1))
         if [ $INFO -eq 1 ]; then
-            echo "Usuario $USUARIO creado con éxito con datos:"
+            echo ""
+	    echo "Usuario $USUARIO creado con éxito con datos:"
             echo "  Comentario: $COMENTARIO"
             echo "  Dir home: $HOME"
-            echo "  Asegurado existencia de directorio home: $CREARHOME" 
+            echo "  Asegurado existencia de directorio home: $CREARHOME"
             echo "  Shell: $SHELL"
             echo ""
         fi
