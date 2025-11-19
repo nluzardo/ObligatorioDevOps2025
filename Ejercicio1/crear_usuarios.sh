@@ -18,7 +18,7 @@ E_NOTREG=3            # archivo no es regular o no existe
 E_NOREAD=4            # no hay permisos de lectura sobre el archivo
 E_BADFORMAT=5         # línea con formato incorrecto (número de campos distinto de 5)
 E_USERADD=6           # fallo al crear un usuario (useradd/chpasswd)
-
+E_USERDUP=7           # usuario duplicado
 
 
 #Funcion para mostrar el uso
@@ -140,6 +140,13 @@ do
         OPCION_HOME=""
     fi
     # Crear el usuario
+    if id "$USUARIO" &>/dev/null; then
+    if [ $INFO -eq 1 ]; then
+        echo "El usuario $USUARIO ya existe. No se creará nuevamente."
+        ERROR_FLAG=$E_USERDUP
+    fi
+    continue
+    fi
     useradd $OPCION_HOME -d "$HOME" -s "$SHELL" -c "$COMENTARIO" "$USUARIO" 2>/dev/null
     RESULTADO=$?
 
