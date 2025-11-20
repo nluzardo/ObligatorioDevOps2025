@@ -5,6 +5,8 @@ El área de Infraestructura recibió la tarea de desarrollar un mecanismo automa
 
 Con este objetivo se desarrolla un script en Bash capaz de crear usuarios basándose en un archivo de entrada estructurado, permitiendo además asignar contraseñas, gestionar la creación del home, y brindar retroalimentación detallada mediante la opción verbose.
 
+Ejercicio 1
+
 Script en Bash — crear_usuarios.sh
 Consigna
 
@@ -172,3 +174,8 @@ Home creado o no según especificación.
 Log de errores directo en consola.
 
 Control estricto de formato y seguridad.
+
+
+Ejercicio 2
+
+
