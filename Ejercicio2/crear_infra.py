@@ -32,13 +32,14 @@ DB_NAME = os.getenv('DB_APP_NAME')
 APP_ADMIN_PASSWORD = os.getenv('APP_ADMIN_PASSWORD')
 APP_ADMIN_USER = os.getenv('APP_ADMIN_USER')
 
-
+#Funcion Para crear claves de EC2, lo garda como un archivo .pem
 def crear_par_claves(nombre):
     # Crear cliente EC2
     ec2 = boto3.client('ec2')
 
     # Crear el par de claves
     key_name = nombre
+#Se maneja la posibilidad de que la Key ya exista
     try:
         key_pair = ec2.create_key_pair(KeyName=key_name)
         with open(f'{key_name}.pem', 'w') as file:
@@ -51,10 +52,11 @@ def crear_par_claves(nombre):
         else:
             raise
 
-
+#Crea un Security Group para EC2 o RDS
 def crear_grupo_seguridad(nombre, desc):
     ec2 = boto3.client('ec2')
     sg_id = None
+#Si el Security group ya existe, devuelve el ID
     try:
         response = ec2.create_security_group(GroupName=nombre, Description=desc)
         sg_id = response['GroupId']
@@ -79,7 +81,8 @@ def crear_grupo_seguridad(nombre, desc):
             raise
     return sg_id
 
-
+#Crea reglas de ingreso para los Security Groups
+#Abre puertos a Internet
 def crear_reglas(sg_id, sg_ec2_id, puerto, nombre, instancia):
     ec2 = boto3.client('ec2')
 
@@ -96,6 +99,7 @@ def crear_reglas(sg_id, sg_ec2_id, puerto, nombre, instancia):
                        'ToPort': puerto,
                        'UserIdGroupPairs': [{'GroupId': sg_ec2_id}]}]
 
+#Intenta agregar la regla y si ya existe solo muestra mensaje de existencia
     try:
         ec2.authorize_security_group_ingress(GroupId=sg_id, IpPermissions=IpPermissions)
         print(f"Regla para {nombre} creada")
@@ -105,7 +109,7 @@ def crear_reglas(sg_id, sg_ec2_id, puerto, nombre, instancia):
         else:
             raise
 
-
+#Crea una istancia RDS si esta no existe
 def crear_rds():
     rds = boto3.client("rds")
 
@@ -117,6 +121,7 @@ def crear_rds():
 
     db_existe = False
 
+#Chequea si existe la instancia RDS, si ya existe obtiene el endpoint
     try:
         response = rds.describe_db_instances(DBInstanceIdentifier=db_identifier)
         print(f"La instancia de rds ya existe")
