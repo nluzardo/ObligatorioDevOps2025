@@ -1,153 +1,115 @@
 Obligatorio Programación DevOps — Gestión de Usuarios en Linux Introducción
 
 El área de Infraestructura recibió la tarea de desarrollar un mecanismo automatizado para la creación controlada de usuarios en un sistema Linux, asegurando validaciones estrictas, registros adecuados, manejo de errores y comportamiento personalizable mediante modificadores.
-
 Con este objetivo se desarrolla un script en Bash capaz de crear usuarios basándose en un archivo de entrada estructurado, permitiendo además asignar contraseñas, gestionar la creación del home, y brindar retroalimentación detallada mediante la opción verbose.
 
 Ejercicio 1
 
-Script en Bash — crear_usuarios.sh Consigna
+# Script Bash – Creación Masiva de Usuarios en Linux
 
-Desarrollar un script en Bash que:
+##  Introducción
+Este script permite **crear usuarios en masa** a partir de un archivo de texto con un formato específico.  
+Incluye controles de validación, manejo de errores, reporte opcional por usuario y la posibilidad de asignar una contraseña común a todos los usuarios creados.
 
-Lea un archivo con usuarios y sus atributos separados por “:”.
+---
 
-Valide:
+#  Descripción del Script
+El script procesa un archivo que contiene, línea por línea, la definición de usuarios con 5 campos separados por `:`.
 
-Formato correcto de la línea (5 campos).
+Ejemplo:
 
-Nombre de usuario válido.
+usuario1:Comentario:/home/usuario1:SI:/bin/bash
 
-Campos no vacíos donde corresponda.
+El script:
+- Valida correctitud del formato del archivo.
+- Chequea usuarios duplicados.
+- Verifica nombres de usuario válidos.
+- Crea o no el home según corresponda.
+- Asigna shell, comentario y contraseña opcional.
+- Muestra información detallada si se usa '-i'.
 
-Que el usuario no exista previamente.
+---
 
-Indicaciones sobre creación del HOME (SI / NO / inválido).
+#  Sintaxis
 
-Permita:
+./crear_usuarios.sh [-i] [-c "contraseña"] archivo_usuarios
 
-Crear usuarios en el sistema.
+## Parámetros
+| Parámetro | Descripción |
+|-----------|-------------|
+| '-i'               | Muestra información detallada por cada usuario creado |
+| '-c "contraseña"'  | Contraseña común para todos los usuarios (sin espacios) |
+| 'archivo_usuarios' | Archivo con los usuarios (obligatorio) |
 
-Crear o no el directorio home según el archivo.
+Ejemplo:
 
-Asignar una contraseña común mediante -c.
+./crear_usuarios.sh -i -c "MiPass123" usuarios.txt
 
-Obtener información detallada por usuario mediante -i.
+---
 
-Prerrequisitos
+# Formato del archivo de entrada
+Cada línea debe contener **5 campos** separados por ':':
 
-El archivo crear_usuarios.sh debe tener permisos de ejecución.
+USUARIO:COMENTARIO:RUTA_HOME:CREARHOME:SHELL
 
-chmod +x crear_usuarios.sh
+Ejemplo:
 
-Sintaxis:
+juanperez:Usuario de Marketing:/home/juanperez:SI:/bin/bash
 
-./crear_usuarios.sh [-i] [-c contraseña] archivo_usuarios.txt
+---
 
-El archivo de entrada debe tener 5 campos separados por “:”:
+# Validaciones del Script
+El script controla:
+- Cantidad correcta de parámetros.
+- Contraseñas sin espacios.
+- Archivo existente, regular y con permisos de lectura.
+- Formato con exactamente 5 campos.
+- Usuarios duplicados.
+- Nombres de usuario válidos.
+- Home absoluto cuando corresponde.
 
-usuario:comentario:home:SI|NO:shell
+Códigos de error:
 
-Solución implementada
+| Código | Significado |
+|--------|-------------|
+| 1 | Uso incorrecto |
+| 2 | No se especificó archivo |
+| 3 | Archivo inexistente o no regular |
+| 4 | Sin permisos de lectura |
+| 5 | Formato incorrecto |
+| 6 | Error al crear usuario |
+| 7 | Usuario duplicado |
+| 8 | Nombre inválido |
 
-El script realiza los siguientes pasos:
+---
 
-Validación de parámetros
-Verifica cantidad de parámetros.
+# Contraseñas
+Si se utiliza '-c':
+- Todos los usuarios reciben la misma contraseña.
+- No se permiten espacios.
+- Si no se especifica contraseña, se informa y se crean sin ella.
 
-Controla modificadores válidos:
+---
 
--i → modo informativo.
+# Salida del Script
 
--c → asignar contraseña común.
+## Modo normal
+- Muestra errores y advertencias.
+- Indica cuántos usuarios fueron creados.
 
-Si la contraseña contiene espacios, se aborta la ejecución.
+## Modo informativo ('-i')
+Muestra:
+- Usuario creado
+- Comentario
+- Shell
+- Home
+- Decisiones tomadas por el script
 
-Verifica existencia y permisos del archivo de usuarios.
+---
 
-Lectura y procesamiento del archivo
-Para cada línea:
+# Requisitos
+- Linux con 'useradd'.
+- Permisos de superusuario.
+- Archivo con formato válido.
 
-Se eliminan espacios sobrantes con xargs.
-
-Se ignoran líneas vacías o comentarios.
-
-Se confirma que existan 5 campos.
-
-Se valida el nombre del usuario con regex Linux:
-
-^[a-z_][a-z0-9_-]*$
-
-Se verifica si el usuario existe en el sistema.
-
-Validaciones específicas
-Si CREARHOME = SI:
-
-Se valida si el HOME es una ruta absoluta.
-
-Si no lo es, se reemplaza por /home/usuario.
-
-Usa useradd -m.
-
-Si CREARHOME = NO o valor inválido:
-
-Usa useradd -M.
-
-No crea directorio HOME, aunque se muestre en /etc/passwd.
-
-Creación del usuario en el sistema
-Se aplica:
-
-Comentario (-c)
-
-Home (-d)
-
-Shell (-s)
-
-Creación o no del HOME (-m / -M)
-
-Si se asignó contraseña, se aplica mediante chpasswd.
-
-Modo informativo (-i)
-Si se activa:
-
-Se muestra un resumen detallado de:
-
-Usuario creado
-
-Comentario
-
-Directorio HOME (o aclaración si NO se creó)
-
-Tipo de creación
-
-Shell configurado
-
-Manejo de errores
-Se gestionan errores específicos:
-
-Código Motivo 1 Uso incorrecto 2 Falta archivo 5 Formato incorrecto 7 Usuario duplicado 8 Nombre de usuario inválido 6 Error al crear usuario 7. Resumen final
-
-Al finalizar, muestra cuántos usuarios se crearon exitosamente.
-
-Ejemplo de archivo de entrada pepe:usuario estandar:/home/pepe:SI:/bin/bash maria:sin home:/home/maria:NO:/bin/bash otrousuario:comentario extra:/home/otro:SI:/bin/bash
-
-Ejemplo de ejecución Modo normal ./crear_usuarios.sh archivo_usuarios.txt
-
-Modo informativo ./crear_usuarios.sh -i archivo_usuarios.txt
-
-Con contraseña común ./crear_usuarios.sh -i -c "Pass123" archivo_usuarios.txt
-
-Resultado esperado
-
-Usuarios creados correctamente según archivo.
-
-Validaciones aplicadas.
-
-Home creado o no según especificación.
-
-Log de errores directo en consola.
-
-Control estricto de formato y seguridad.
-
-Ejercicio 2
+---
