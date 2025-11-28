@@ -1,19 +1,19 @@
-#Obligatorio Programación DevOps — Gestión de Usuarios en Linux Introducción
+#  Obligatorio Programación DevOps — Gestión de Usuarios en Linux Introducción
 
 El área de Infraestructura recibió la tarea de desarrollar un mecanismo automatizado para la creación controlada de usuarios en un sistema Linux, asegurando validaciones estrictas, registros adecuados, manejo de errores y comportamiento personalizable mediante modificadores.
 Con este objetivo se desarrolla un script en Bash capaz de crear usuarios basándose en un archivo de entrada estructurado, permitiendo además asignar contraseñas, gestionar la creación del home, y brindar retroalimentación detallada mediante la opción verbose.
 
 Ejercicio 1
 
-# Script Bash – Creación Masiva de Usuarios en Linux
+##  Script Bash – Creación Masiva de Usuarios en Linux
 
-##  Introducción
+###  Introducción
 Este script permite **crear usuarios en masa** a partir de un archivo de texto con un formato específico.  
 Incluye controles de validación, manejo de errores, reporte opcional por usuario y la posibilidad de asignar una contraseña común a todos los usuarios creados.
 
 ---
 
-#  Descripción del Script
+##  Descripción del Script
 El script procesa un archivo que contiene, línea por línea, la definición de usuarios con 5 campos separados por `:`.
 
 Ejemplo:
@@ -30,11 +30,11 @@ El script:
 
 ---
 
-#  Sintaxis
+##  Sintaxis
 
 ./crear_usuarios.sh [-i] [-c "contraseña"] archivo_usuarios
 
-## Parámetros
+###  Parámetros
 | Parámetro | Descripción |
 |-----------|-------------|
 | '-i'               | Muestra información detallada por cada usuario creado |
@@ -47,7 +47,7 @@ Ejemplo:
 
 ---
 
-# Formato del archivo de entrada
+##  Formato del archivo de entrada
 Cada línea debe contener **5 campos** separados por ':':
 
 USUARIO:COMENTARIO:RUTA_HOME:CREARHOME:SHELL
@@ -58,7 +58,7 @@ juanperez:Usuario de Marketing:/home/juanperez:SI:/bin/bash
 
 ---
 
-# Validaciones del Script
+##  Validaciones del Script
 El script controla:
 - Cantidad correcta de parámetros.
 - Contraseñas sin espacios.
@@ -83,7 +83,7 @@ Códigos de error:
 
 ---
 
-# Contraseñas
+##  Contraseñas
 Si se utiliza '-c':
 - Todos los usuarios reciben la misma contraseña.
 - No se permiten espacios.
@@ -91,13 +91,13 @@ Si se utiliza '-c':
 
 ---
 
-# Salida del Script
+##  Salida del Script
 
-## Modo normal
+###  Modo normal
 - Muestra errores y advertencias.
 - Indica cuántos usuarios fueron creados.
 
-## Modo informativo ('-i')
+###  Modo informativo ('-i')
 Muestra:
 - Usuario creado
 - Comentario
@@ -107,7 +107,7 @@ Muestra:
 
 ---
 
-# Requisitos
+##  Requisitos
 - Linux con 'useradd'.
 - Permisos de superusuario.
 - Archivo con formato válido.
