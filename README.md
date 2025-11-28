@@ -1,4 +1,4 @@
-Obligatorio Programación DevOps — Gestión de Usuarios en Linux Introducción
+#Obligatorio Programación DevOps — Gestión de Usuarios en Linux Introducción
 
 El área de Infraestructura recibió la tarea de desarrollar un mecanismo automatizado para la creación controlada de usuarios en un sistema Linux, asegurando validaciones estrictas, registros adecuados, manejo de errores y comportamiento personalizable mediante modificadores.
 Con este objetivo se desarrolla un script en Bash capaz de crear usuarios basándose en un archivo de entrada estructurado, permitiendo además asignar contraseñas, gestionar la creación del home, y brindar retroalimentación detallada mediante la opción verbose.
