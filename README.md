@@ -111,3 +111,76 @@ Muestra:
 - Archivo con formato válido.
 
 ---
+
+##  README — Ejercicio 2: Infraestructura Automatizada en AWS
+
+Descripción: Este proyecto automatiza la creación de una infraestructura básica en AWS para desplegar una aplicación web con base de datos. Utiliza Python y boto3 para crear los recursos necesarios, incluyendo EC2, RDS, S3, grupos de seguridad y claves SSH. El despliegue se adapta a una aplicación PHP/Apache clonada desde GitHub.
+
+##  Requisitos:
+
+Cuenta activa en AWS (lab o personal)
+
+Python 3.12 o superior
+
+AWS CLI configurado
+
+Acceso a credenciales temporales (Access Key, Secret Key, Session Token)
+
+Sistema Linux con soporte para Bash o Fish
+
+Instalación:
+
+Clonar el repositorio: git clone https://github.com/nluzardo/App_Obligatorio.git cd Ejercicio2
+
+Crear y activar entorno virtual:
+
+Para Bash: python3 -m venv venv source venv/bin/activate
+
+Para Fish: source venv/bin/activate.fish
+
+Instalar dependencias: pip install boto3 python-dotenv 
+
+Configuración del entorno:
+
+Crear archivo .env basado en env.example: cp env.example .env
+
+Completar con credenciales y parámetros válidos:
+
+##  Código
+
+AWS_ACCESS_KEY_ID=TU_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY=TU_SECRET_KEY
+AWS_SESSION_TOKEN=TU_SESSION_TOKEN
+AWS_REGION=us-east-1
+
+KEY_NAME=Key_Salbanese
+AWS_IMAGE_ID=ami-0fa3fe0fa7920f68e
+AWS_INSTANCE_TYPE=t2.micro
+AWS_S3_NAME=Obligatorio_Salbanese
+DB_IDENTIFIER=una-bd2
+DB_INSTANCE_CLASS=db.t3.micro
+DB_ENGINE=mariadb
+DB_MASTER_USER_NAME=admin
+DB_MASTER_PASSWORD=Admin123!
+
+##  Ejecución:
+
+Ejecutar el script principal: python crear_infra.py
+
+El script realiza:
+
+Creación de par de claves
+
+Creación de grupos de seguridad con reglas para SSH, HTTP y DB
+
+Creación de bucket S3
+
+Subida de archivo de prueba
+
+Creación de instancia EC2 con user_data_socios.sh
+
+Creación de instancia RDS
+
+## Verificar acceso web: 
+
+Abrir navegador en: http://<IP pública de la EC2>
