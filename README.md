@@ -3,9 +3,7 @@
 El área de Infraestructura recibió la tarea de desarrollar un mecanismo automatizado para la creación controlada de usuarios en un sistema Linux, asegurando validaciones estrictas, registros adecuados, manejo de errores y comportamiento personalizable mediante modificadores.
 Con este objetivo se desarrolla un script en Bash capaz de crear usuarios basándose en un archivo de entrada estructurado, permitiendo además asignar contraseñas, gestionar la creación del home, y brindar retroalimentación detallada mediante la opción verbose.
 
-Ejercicio 1
-
-##  Script Bash – Creación Masiva de Usuarios en Linux
+##  Ejercicio 1 - Script Bash – Creación Masiva de Usuarios en Linux
 
 ###  Introducción
 Este script permite **crear usuarios en masa** a partir de un archivo de texto con un formato específico.  
